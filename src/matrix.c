@@ -15,7 +15,7 @@ void mat_print(const double *A, int rows, int cols) {
 
 void mat_add(const double *A, const double *B, double *C, int rows, int cols) {
     /* Elementwise matrix addition - walking through each array*/
-    int i, j;
+    int i;
 
     for (i = 0; i < (rows * cols); i++) {
         C[i] = A[i] + B[i];
@@ -56,21 +56,10 @@ int mat_inv_2x2(const double *A, double *B) {
         fprintf(stderr, "mat_inv_2x2: matrix is singular\n");
         return -1;
     }
-    
+
     B[0] = (1/det) * A[3];
     B[1] = -((1/det) * A[1]);
     B[2] = -((1/det) * A[2]);
     B[3] = (1/det) * A[0];
     return 0;
-}
-
-int main() {
-    const double X[6] = {1, 2, 3,
-                         4, 5, 6};
-    const double Y[6] = {1, 2,
-                         3, 4,
-                        5, 6};
-    double Z[6];
-    mat_transpose(X,Z,2,3);
-    mat_print(Z, 3, 2);
 }
