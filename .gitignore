@@ -1,8 +1,6 @@
 # VSCode files
 .vscode
 .vscode/
-
 *.o
 *.so
-tests/
-tests
+*.exe
