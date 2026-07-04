@@ -7,7 +7,7 @@ typedef struct {
 
 void kalman_predict(KalmanState *s);
 double kalman_update(KalmanState *s, double y);
-double kalman_filter(double y[], int T, KalmanState *s);
+double kalman_filter(double y[], int T, KalmanState *s, double a_out[]);
 
 #endif
 

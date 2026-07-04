@@ -21,7 +21,7 @@ double kalman_update(KalmanState *s, double y) {
     return -0.5 * (log(2*M_PI) + log(F) + (v*v / F));
 }
 
-double kalman_filter(double y[], int T, KalmanState *s) {
+double kalman_filter(double y[], int T, KalmanState *s, double a_out[]) {
     int i;
     double Lt;
     double Lt_sum = 0;
@@ -30,6 +30,7 @@ double kalman_filter(double y[], int T, KalmanState *s) {
         kalman_predict(s);
         Lt = kalman_update(s, y[i]);
         Lt_sum += Lt;
+        a_out[i] = s->a;
     }
     return Lt_sum;
 }
