@@ -1,8 +1,15 @@
-# VSCode files
-.vscode
-.vscode/
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# C build artifacts
 *.o
 *.so
 *.exe
 
-venv/
+# Editor
+.vscode/
+
+# OS/misc junk (optional but common)
+.DS_Store
