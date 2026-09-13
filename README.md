@@ -1,47 +1,44 @@
-<div align="center">
-
 # kalman-c
 
-**Kalman filter implemented in C, exposed to Python via `ctypes`, validated against `statsmodels.tsa.UnobservedComponents`.**
+**A Kalman filter written in C, called from Python through `ctypes`, and checked against `statsmodels.tsa.UnobservedComponents` to make sure it's actually correct.**
 
-</div>
+Writing the code directly in C removes the Python interpreter overhead
+that dominates a naive implementation, while still matching a trusted
+reference implementation to within numerical noise.
 
-- **19x faster** than statsmodels at N=10⁶ observations (24–49x at smaller N)
-- Filtered states match statsmodels to **1.9e-9** on simulated data, **2.9e-11** on real UK house-price data
-- Pure C, hand-rolled matrix routines — no external numerical libraries
-- Portfolio / learning project, not intended for production use — see [Limitations](#limitations--future-work)
-
-### Contents
-[Benchmark](#benchmark) · [Models](#models) · [Structure](#structure) · [Build](#build) · [Usage](#usage) · [Validation](#validation) · [Limitations](#limitations--future-work)
+- 19x faster than statsmodels at a million observations (24–49x faster on smaller series)
+- Filtered states agree with statsmodels to within $1.9e-9$ on simulated data and $2.9e-11$ on real UK house-price data
+- Plain C, simple matrix helpers written by hand (no BLAS, no external numerical libraries)
+- A learning/portfolio project, not intended for production use — see [Limitations](#limitations--future-work)
 
 ---
 
 ## Benchmark
-
-<div align="center">
-
 ![Runtime scaling](benchmarks/runtime_scaling.png)
 
-</div>
-
-Local level model, median wall time over 7 runs, series length up to 10^6
-observations. The C filter vs. **statsmodels** — an optimized, Cython/C-backed
-library and the relevant baseline — is **19x faster at N=10^6** (24–49x at
-smaller N). Against a naive line-by-line Python port of the same recursion
-(`python/kalman_python.py`), it is **109x faster at N=10^6** — included as
-context, not the headline claim, since naive Python is not a realistic
-baseline.
+Local level model, median time over 7 runs, series length up to $10^6$
+observations. The relevant comparison is against statsmodels, which is
+already Cython/C-backed — the C filter is 19x faster at $N=10^6$ (24–49x
+faster at smaller N). Also shown is a naive line-by-line Python port of the
+same recursion (`python/kalman_python.py`), which the C filter beats by
+109x at $N=10^6$; this is included for reference only, since unoptimized
+Python is not a meaningful baseline.
 
 ---
 
 ## Models
 
-State-space form: `y_t = Z a_t + ε_t`, `a_t = T a_{t-1} + η_t`,
-`ε_t ~ N(0, H)`, `η_t ~ N(0, Q)`. The C code implements the general
-predict/update recursion for arbitrary `T`/`Z`; two configurations are
-validated.
+State-space form:
+- $y_t = Z a_t + \epsilon_t$
+- $a_t = Ta_{t-1} + \eta_t$
+- $\epsilon_t \sim N(0, H)$ 
+- $\eta_t \sim N(0, Q)$
 
-**Local level** — `a_t` is a scalar, `T = 1`, `Z = 1`.
+The C code implements the general
+predict/update recursion for arbitrary $T/Z$; two configurations are
+validated against statsmodels.
+
+**Local level** — $a_t$ is a scalar, $T = 1$, $Z = 1$.
 
 $$
 \begin{aligned}
@@ -52,8 +49,8 @@ $$
 \end{aligned}
 $$
 
-**Local linear trend** — state `[level, slope]`, `T = [[1,1],[0,1]]`,
-`Z = [1, 0]`.
+**Local linear trend** — state $[level, slope]$, $T = [[1,1],[0,1]]$,
+$Z = [1, 0]$.
 
 $$
 \begin{aligned}
@@ -64,8 +61,8 @@ $$
 \end{aligned}
 $$
 
-Each update also returns the Gaussian log-likelihood contribution
-`-0.5 (log 2π + log F_t + v_t² / F_t)`, summed over the series.
+Each update step also returns the Gaussian log-likelihood contribution
+$-0.5 (\log 2\pi + \log F_t + v_t^2 / F_t)$, summed over the series. This would be the starting point for fitting $H$/$Q$ through maximum likelihood, though that isn't implemented here.
 
 ---
 
@@ -102,6 +99,8 @@ requirements.txt
 
 </details>
 
+---
+
 ## Build
 
 <details>
@@ -121,6 +120,8 @@ pip install -r requirements.txt
 ```
 
 </details>
+
+---
 
 ## Usage
 
@@ -142,8 +143,8 @@ a_out, loglik, state = run_kalman_filter(
 # loglik: summed Gaussian log-likelihood
 ```
 
-For local linear trend, pass `n=2`, `Z=[1.0, 0.0]`,
-`Tmat=[1.0, 1.0, 0.0, 1.0]`, and 2x2-flattened `P0`/`Q`.
+For the local linear trend model, pass `n=2`, `Z=[1.0, 0.0]`,
+`Tmat=[1.0, 1.0, 0.0, 1.0]`, and `P0`/`Q` flattened as 2x2 matrices.
 
 </details>
 
@@ -162,10 +163,12 @@ initial state, and compare filtered states and log-likelihood:
 | Local linear trend | simulated, T=1000 | 1.9e-9 | 1.4e-8 |
 | Local level | UK house prices (England, quarterly, 1975–), T=205 | 2.9e-11 | 6.8e-13 |
 
+---
+
 ## Limitations / future work
 
 - No fixed-interval smoother (forward filter only).
-- No EM or MLE-based parameter estimation — `H`/`Q` are passed in, not fit.
-- `T`, `Z`, `H`, `Q` are fixed per call; no time-varying system matrices.
+- No EM or MLE-based parameter estimation — $H$/$Q$ are passed in, not fit.
+- $T$, $Z$, $H$, $Q$ are fixed per call; no time-varying system matrices.
 - No SIMD or cache-blocking in the matrix routines.
 - Bound via `ctypes`; no CPython C-API extension module.
