@@ -31,9 +31,11 @@ def test_stats_local_houseprice():
     a_filtered_sm = res.filtered_state[0]
     loglik_sm = res.llf
 
-    a_out, loglik, state = run_kalman_filter(df_eng.values, a0, P0, H, Q)
+    a_out, loglik, state = run_kalman_filter(
+        df_eng.values, a0=[a0], P0=[P0], H=H, Q=[Q], Z=[1.0], Tmat=[1.0], n=1
+    )
 
-    assert np.allclose(a_out, a_filtered_sm, atol=1e-6)
+    assert np.allclose(a_out[:, 0], a_filtered_sm, atol=1e-6)
     assert np.isclose(loglik, loglik_sm, atol=1e-6)
 
 if __name__ == "__main__":
