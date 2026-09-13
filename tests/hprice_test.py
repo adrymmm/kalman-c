@@ -4,7 +4,7 @@ import statsmodels.api as sm
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "python"))
-from kalman_wrapper import run_kalman_filter
+from python.kalman_wrapper import run_kalman_filter
 
 IN = "data/"
 
