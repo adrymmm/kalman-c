@@ -13,3 +13,6 @@ venv/
 
 # OS/misc junk (optional but common)
 .DS_Store
+*.o
+*.so
+test_llt
