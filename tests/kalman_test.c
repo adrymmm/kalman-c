@@ -16,7 +16,7 @@ int main() {
         .n = 2
     };
 
-    double a_out[N_OBS * 2];  // n_obs * n, flat — same layout kalman_filter writes to
+    double a_out[N_OBS * 2];
 
     double result = kalman_filter(Y, N_OBS, &s, a_out);
 
