@@ -62,7 +62,7 @@ $$
 $$
 
 Each update step also returns the Gaussian log-likelihood contribution
-$-0.5 (\log 2\pi + \log F_t + v_t^2 / F_t)$, summed over the series. This would be the starting point for fitting $H$/$Q$ through maximum likelihood, though that isn't implemented here.
+$-0.5 (\log 2\pi + \log F_t + v_t^2 / F_t)$, summed over the series. This would be the starting point for fitting $H/Q$ through maximum likelihood, though that isn't implemented here.
 
 ---
 
